@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Выгодная покупка</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222d;
+    --accent: #00e5a0;
+    --accent2: #ff6b6b;
+    --accent3: #ffd93d;
+    --text: #f0f0f5;
+    --muted: #6b6b80;
+    --border: #2e2e3e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,229,160,0.07) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, rgba(255,107,107,0.07) 0%, transparent 60%);
+  }
+
+  h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent), #00b4d8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 28px;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  }
+
+  .card.winner {
+    border-color: var(--accent);
+    transform: scale(1.01);
+    box-shadow: 0 0 24px rgba(0,229,160,0.15);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .card-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .badge-winner {
+    background: var(--accent);
+    color: #000;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,229,160,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(0,229,160,0); }
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+
+  .field label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .field input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .field input:focus { border-color: var(--accent); }
+  .field input::placeholder { color: var(--muted); font-weight: 400; }
+
+  .name-field { margin-bottom: 12px; }
+
+  .name-field input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.95rem;
+    padding: 9px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .name-field input:focus { border-color: var(--accent); }
+  .name-field input::placeholder { color: var(--muted); }
+
+  .price-per {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .price-per span:first-child { font-size: 0.72rem; color: var(--muted); }
+
+  .price-per .val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent3);
+  }
+
+  .card.winner .price-per .val { color: var(--accent); }
+
+  .remove-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+    transition: all 0.2s;
+    font-family: 'Manrope', sans-serif;
+  }
+
+  .remove-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .add-btn {
+    background: transparent;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    color: var(--muted);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 16px;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 24px;
+  }
+
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .result {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    display: none;
+  }
+
+  .result.visible { display: block; }
+
+  .result-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  .result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-item:last-child { border-bottom: none; }
+  .result-item .r-name { font-weight: 600; font-size: 0.9rem; flex: 1; }
+
+  .result-item .r-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .result-item.r-best .r-price { color: var(--accent); }
+  .result-item.r-worst .r-price { color: var(--accent2); }
+
+  .rank {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  .r-best .rank { background: var(--accent); color: #000; }
+  .r-worst .rank { background: var(--accent2); color: #fff; }
+  .r-mid .rank { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .savings {
+    margin-top: 16px;
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .savings .s-label {
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .savings .s-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--accent);
+  }
+
+  .unit-select-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .unit-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .unit-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,160,0.08);
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Выгодная покупка</h1>
+<p class="subtitle">Сравни цены за единицу веса</p>
+
+<p class="section-label">Единица сравнения</p>
+<div class="unit-select-wrap">
+  <button class="unit-btn active" onclick="setUnit('кг', this)">за 1 кг</button>
+  <button class="unit-btn" onclick="setUnit('100г', this)">за 100 г</button>
+  <button class="unit-btn" onclick="setUnit('л', this)">за 1 л</button>
+  <button class="unit-btn" onclick="setUnit('100мл', this)">за 100 мл</button>
+</div>
+
+<div class="cards" id="cards"></div>
+
+<button class="add-btn" onclick="addCard()">+ Добавить товар</button>
+
+<div class="result" id="result">
+  <div class="result-title">Рейтинг выгодности</div>
+  <div id="result-list"></div>
+  <div class="savings" id="savings"></div>
+</div>
+
+<script>
+let items = [];
+let unit = 'кг';
+let idCounter = 0;
+
+const unitLabels = { 'кг': 'за 1 кг', '100г': 'за 100 г', 'л': 'за 1 л', '100мл': 'за 100 мл' };
+const unitDivisors = { 'кг': 1000, '100г': 100, 'л': 1000, '100мл': 100 };
+
+function setUnit(u, btn) {
+  unit = u;
+  document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  calculate();
+}
+
+function addCard() {
+  const id = idCounter++;
+  items.push({ id, name: '', price: '', weight: '' });
+  renderCards();
+}
+
+function removeCard(id) {
+  items = items.filter(i => i.id !== id);
+  renderCards();
+}
+
+function update(id, field, value) {
+  const item = items.find(i => i.id === id);
+  if (item) { item[field] = value; calculate(); }
+}
+
+function getPricePerUnit(item) {
+  const p = parseFloat(item.price);
+  const w = parseFloat(item.weight);
+  if (!p || !w || w <= 0) return null;
+  return (p / w) * unitDivisors[unit];
+}
+
+function calculate() {
+  const valid = items.filter(i => getPricePerUnit(i) !== null);
+
+  items.forEach(item => {
+    const el = document.getElementById('ppu-' + item.id);
+    if (!el) return;
+    const val = getPricePerUnit(item);
+    el.textContent = val ? val.toFixed(2) + ' ₽' : '—';
+  });
+
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('winner'));
+
+  if (valid.length < 2) {
+    document.getElementById('result').classList.remove('visible');
+    return;
+  }
+
+  const sorted = [...valid].sort((a, b) => getPricePerUnit(a) - getPricePerUnit(b));
+  const winnerId = sorted[0].id;
+
+  const winnerCard = document.getElementById('card-' + winnerId);
+  if (winnerCard) winnerCard.classList.add('winner');
+
+  items.forEach(item => {
+    const badge = document.getElementById('badge-' + item.id);
+    if (badge) badge.style.display = item.id === winnerId ? 'inline-block' : 'none';
+  });
+
+  const resultList = document.getElementById('result-list');
+  resultList.innerHTML = sorted.map((item, idx) => {
+    const ppu = getPricePerUnit(item);
+    const cls = idx === 0 ? 'r-best' : idx === sorted.length - 1 ? 'r-worst' : 'r-mid';
+    const name = item.name || ('Товар ' + (items.findIndex(i => i.id === item.id) + 1));
+    return `<div class="result-item ${cls}">
+      <div class="rank">${idx + 1}</div>
+      <div class="r-name">${name}</div>
+      <div class="r-price">${ppu.toFixed(2)} ₽<br><small style="font-size:0.6rem;font-weight:400;color:var(--muted)">${unitLabels[unit]}</small></div>
+    </div>`;
+  }).join('');
+
+  const bestPpu = getPricePerUnit(sorted[0]);
+  const worstPpu = getPricePerUnit(sorted[sorted.length - 1]);
+  const diff = ((worstPpu - bestPpu) / worstPpu * 100).toFixed(0);
+  document.getElementById('savings').innerHTML = `
+    <div class="s-label">Экономия с лучшим вариантом</div>
+    <div class="s-val">до ${diff}% дешевле</div>`;
+
+  document.getElementById('result').classList.add('visible');
+}
+
+function renderCards() {
+  const container = document.getElementById('cards');
+  container.innerHTML = items.map((item, idx) => `
+    <div class="card" id="card-${item.id}">
+      <div class="card-header">
+        <span class="card-num">Товар ${idx + 1}</span>
+        <span class="badge-winner" id="badge-${item.id}" style="display:none">✓ Выгоднее всех</span>
+      </div>
+      <div class="name-field">
+        <input type="text" placeholder="Название (необязательно)" value="${item.name}"
+          oninput="update(${item.id}, 'name', this.value)" />
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label>Цена (₽)</label>
+          <input type="number" inputmode="decimal" placeholder="0.00" value="${item.price}"
+            oninput="update(${item.id}, 'price', this.value)" />
+        </div>
+        <div class="field">
+          <label>Вес / объём (г или мл)</label>
+          <input type="number" inputmode="decimal" placeholder="0" value="${item.weight}"
+            oninput="update(${item.id}, 'weight', this.value)" />
+        </div>
+      </div>
+      <div class="price-per">
+        <span>${unitLabels[unit]}</span>
+        <span class="val" id="ppu-${item.id}">—</span>
+      </div>
+      ${items.length > 2 ? `<button class="remove-btn" onclick="removeCard(${item.id})">✕ Удалить</button>` : ''}
+    </div>
+  `).join('');
+  calculate();
+}
+
+addCard();
+addCard();
+</script>
+</body>
+</html>
